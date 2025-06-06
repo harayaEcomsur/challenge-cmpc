@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cmpc-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: libros_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cmpc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  backend:
+    build: ./cmpc-libros-backend
+    container_name: cmpc-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./cmpc-libros-backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=libros_db
+      - DB_SYNCHRONIZE=true
+      - JWT_SECRET=your-super-secret-key-change-in-production
+      - JWT_EXPIRATION_TIME=3600s
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cmpc-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  frontend:
+    build: ./cmpc-libros-frontend
+    container_name: cmpc-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./cmpc-libros-frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - cmpc-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+networks:
+  cmpc-network:
+    name: cmpc-network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  postgres_data:
