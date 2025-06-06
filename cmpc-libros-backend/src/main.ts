@@ -9,7 +9,6 @@ import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 async function bootstrap() {
-  // Crear directorio de uploads si no existe
   const uploadsDir = join(process.cwd(), 'uploads', 'books');
   if (!existsSync(uploadsDir)) {
     mkdirSync(uploadsDir, { recursive: true });

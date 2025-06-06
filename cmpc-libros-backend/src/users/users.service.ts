@@ -30,5 +30,4 @@ export class UsersService {
     });
     return result > 0;
   }
-  // ... otros métodos si son necesarios
 }
