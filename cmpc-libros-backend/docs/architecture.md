@@ -40,52 +40,29 @@ graph TB
 
 ```mermaid
 erDiagram
-    BOOKS ||--o{ AUTHORS : "tiene"
-    BOOKS ||--o{ EDITORIALS : "pertenece"
-    BOOKS ||--o{ GENRES : "categoriza"
-    USERS ||--o{ BOOKS : "gestiona"
-
-    BOOKS {
-        int id PK
-        string title
-        decimal price
-        boolean availability
-        string imageUrl
-        int authorId FK
-        int editorialId FK
-        int genreId FK
-        datetime createdAt
-        datetime updatedAt
+    users ||--o{ books : "creates"
+    
+    users {
+        int id PK "increment"
+        varchar email UK "not null"
+        varchar password_hash "not null"
+        timestamp created_at "not null"
+        timestamp updated_at "not null"
+        timestamp deleted_at "null"
     }
 
-    AUTHORS {
-        int id PK
-        string name
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    EDITORIALS {
-        int id PK
-        string name
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    GENRES {
-        int id PK
-        string name
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    USERS {
-        int id PK
-        string email
-        string password
-        string role
-        datetime createdAt
-        datetime updatedAt
+    books {
+        int id PK "increment"
+        varchar title "not null, len: [1, 255]"
+        varchar author "not null"
+        varchar editorial "null"
+        varchar genre "null"
+        decimal price "not null, min: 0, decimal(10,2)"
+        int availability "not null, default: 1, isIn: [0,1]"
+        varchar image_url "null"
+        timestamp created_at "not null"
+        timestamp updated_at "not null"
+        timestamp deleted_at "null"
     }
 ```
 
